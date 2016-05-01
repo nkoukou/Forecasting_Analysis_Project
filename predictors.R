@@ -1,5 +1,5 @@
 # Forecasts divisions
-setwd('C:\\Users\\Nikos\\Desktop\\itim\\stl_forecasts_season1')
+#setwd('C:\\Users\\Nikos\\Desktop\\itim\\stlm_forecasts')
 require(grDevices)
 
 test = test1
@@ -73,7 +73,7 @@ multireg_division = function(division, res=TRUE){
   return(return_list)
 }
 
-stl_division = function(division, trend=15, season=3){
+stl_division = function(division, trend=15, season="periodic", lambda=0.35){
   # Forecasts a division for the next year by decomposition into seasonal and trend components.
   # Returns a list with the fitted data and the forecasted data.
   deps=c()
@@ -95,22 +95,22 @@ stl_division = function(division, trend=15, season=3){
   }
   init = 2014-1/52
   data = ts(data_temp, start=init, frequency=52)
-  fit = stl(data, t.window=trend, s.window=season, robust=TRUE)
-  fcast = forecast(fit, method="naive", h=52)
+  fit = stl(data, t.window=trend, s.window=season)
+  fcast = stlf(data, t.window=trend, s.window=season, robust=TRUE, h=52, lambda=lambda)
   sum_up = summary(fit)
   return_list = list(fit, data.frame(fcast))
-  #png(filename=paste(gsub("\\.","_", division), "_forecast.png",sep=""))
+  png(filename=paste(gsub("\\.","_", division), "_forecast.png",sep=""))
   par(mfrow=c(1,1))
-  plot(fcast, main=paste(division, season), xlab='Year (weeks)', ylab='Total Sales')
+  plot(fcast, main=paste(division, lambda), xlab='Year (weeks)', ylab='Total Sales')
   lines(data)
   legend("topleft", lty=1, col=c(1,2), legend = c("Data"))
-  #dev.off()
+  dev.off()
   return(return_list)
 }
 
 stl_test = function(division){
-  for (i in seq(1,25)) {
-    stl_division(division, trend=15, season=i)
+  for (i in seq(0,1,0.05)) {
+    stl_division(division, trend=15, season="periodic",lambda=i)
   }
 }
 
@@ -129,14 +129,14 @@ multireg_all_divisions = function(do_res=TRUE){
   return(return_list)
 }
 
-stl_all_divisions = function(trend=15, season=3){
+stl_all_divisions = function(trend=15, season=3, lambda=0.35){
 # Calls multireg_division for all divisions
 # Returns a list with two elements-lists which correspond to the divisions:
 # 1. Fitted data 2. Forecasted data
   fits=list(); fcasts=list()
   
   for (division in division_titles){
-    temp = stl_division(division, trend=trend, season=season)
+    temp = stl_division(division, trend=trend, season=season, lambda=0.3)
     div = gsub("\\.","_", division)
     fits[div]=temp[1]; fcasts[div]=temp[2]
   }
