@@ -1,5 +1,5 @@
 # Forecasts divisions
-setwd('C:\\Users\\Nikos\\Desktop\\itim\\initial_forecasts')
+setwd('C:\\Users\\Nikos\\Desktop\\itim\\stl_forecasts_season1')
 require(grDevices)
 
 test = test1
@@ -28,9 +28,9 @@ select_dep = function(department){
   current_data = as.integer(data.matrix(test[c(-1,-2,-107,-108), department]))
 }
 
-forecast_division = function(division, res=TRUE){
+multireg_division = function(division, res=TRUE){
 # Forecasts a division for the next year by multiple regression with predictors the 52 weeks of a year.
-# Returns a list with the division title, the summary of the fit, the Durbin-Watson test and the fitted data.
+# Returns a list with the summary of the fit, the Durbin-Watson test, the fitted data and the forecasted data.
 # It is not very good according to the Durbin-Watson test
   deps=c()
   j=1
@@ -53,42 +53,95 @@ forecast_division = function(division, res=TRUE){
   fcast = forecast(fit, h=52)
   return_list = list(sum_up, dw, fitted_data, data.frame(fcast))
   
-  png(filename=paste(gsub("\\.","_", division), "_forecast.png",sep=""))
+  #png(filename=paste(gsub("\\.","_", division), "_forecast.png",sep=""))
   par(mfrow=c(1,1))
   plot(fcast, main=division, xlab='Year (weeks)', ylab='Total Sales')
   lines(data)
   lines(fitted_data, col=2)
   legend("topleft", lty=1, col=c(1,2), legend = c("Data", "Multi-reg"))
-  dev.off()
+  #dev.off()
   
   if (res==TRUE){
-    png(filename=paste(gsub("\\.","_", division), "_residuals.png",sep=""), type="cairo")
+    #png(filename=paste(gsub("\\.","_", division), "_residuals.png",sep=""), type="cairo")
     resids = residuals(fit)
     par(mfrow=c(1,2))
     plot(resids, xlab='Year (weeks)', ylab='Residuals')
     Acf(resids, main='Autocorrelation')
-    dev.off()
+    #dev.off()
   }
   
   return(return_list)
 }
 
-forecast_all_divisions = function(do_res=TRUE){
-# Calls forecast_division for all divisions
-# Returns a list with four elements-lists which correspond to the divisions alphabetically:
-# 1. Fit summaries 2. Durbin-Watson tests 3. Fitted data 4. Forecasted data
-  #sum_ups=list(); dws = list(); fits = list(); fcasts = list()
-  #length(sum_ups) = lt; length(dws) = lt; length(fits) = lt; length(fcasts) = lt
-  #i=0
-  for (division in division_titles){
-    temp = forecast_division(division, res=do_res)
-    #sum_ups[i] = temp[1]; dws[i] = temp[2]; fits[i] = temp[3]; fcasts[i] = temp[4]
-    #i=i+1
+stl_division = function(division, trend=15, season=3){
+  # Forecasts a division for the next year by decomposition into seasonal and trend components.
+  # Returns a list with the fitted data and the forecasted data.
+  deps=c()
+  j=1
+  for (i in seq(1,cols)){
+    if (grepl(division,colnames(test)[i])){
+      deps[j] = colnames(test)[i]
+      j=j+1
+    }
   }
-  #return_list=list(sum_ups, dws, fits, fcast)
+  data=0
+  for (dep in deps)
+  {
+    data = data + select_dep(dep)
+  }
+  data_temp = data[1]
+  for (i in seq(1,length(data))){
+         data_temp[i+1]=data[i]
+  }
+  init = 2014-1/52
+  data = ts(data_temp, start=init, frequency=52)
+  fit = stl(data, t.window=trend, s.window=season, robust=TRUE)
+  fcast = forecast(fit, method="naive", h=52)
+  sum_up = summary(fit)
+  return_list = list(fit, data.frame(fcast))
+  #png(filename=paste(gsub("\\.","_", division), "_forecast.png",sep=""))
+  par(mfrow=c(1,1))
+  plot(fcast, main=paste(division, season), xlab='Year (weeks)', ylab='Total Sales')
+  lines(data)
+  legend("topleft", lty=1, col=c(1,2), legend = c("Data"))
+  #dev.off()
+  return(return_list)
 }
 
+stl_test = function(division){
+  for (i in seq(1,25)) {
+    stl_division(division, trend=15, season=i)
+  }
+}
 
+multireg_all_divisions = function(do_res=TRUE){
+# Calls multireg_division for all divisions
+# Returns a list with four elements-lists which correspond to the divisions:
+# 1. Fit summaries 2. Durbin-Watson tests 3. Fitted data 4. Forecasted data
+  sum_ups=list(); dws=list(); fits=list(); fcasts=list()
+  
+  for (division in division_titles){
+    temp = multireg_division(division, res=do_res)
+    div = gsub("\\.","_", division)
+    sum_ups[div]=temp[1]; dws[div]=temp[2]; fits[div]=temp[3]; fcasts[div]=temp[4]
+  }
+  return_list=list("sumup"=sum_ups, "dw"=dws, "fits"=fits, "fcasts"=fcasts)
+  return(return_list)
+}
+
+stl_all_divisions = function(trend=15, season=3){
+# Calls multireg_division for all divisions
+# Returns a list with two elements-lists which correspond to the divisions:
+# 1. Fitted data 2. Forecasted data
+  fits=list(); fcasts=list()
+  
+  for (division in division_titles){
+    temp = stl_division(division, trend=trend, season=season)
+    div = gsub("\\.","_", division)
+    fits[div]=temp[1]; fcasts[div]=temp[2]
+  }
+  return_list=list("fits"=fits, "fcasts"=fcasts)
+}
 
 
 
