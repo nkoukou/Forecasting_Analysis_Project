@@ -1,6 +1,7 @@
 # Forecasts divisions
-#setwd('C:\\Users\\Nikos\\Desktop\\itim\\stlm_forecasts')
+setwd('C:\\Users\\Nikos\\Desktop\\itim\\stlm_forecasts')
 require(grDevices)
+library(forecast)
 
 test = test1
 
@@ -101,7 +102,7 @@ stl_division = function(division, trend=15, season="periodic", lambda=0.35){
   return_list = list(fit, data.frame(fcast))
   png(filename=paste(gsub("\\.","_", division), "_forecast.png",sep=""))
   par(mfrow=c(1,1))
-  plot(fcast, main=paste(division, lambda), xlab='Year (weeks)', ylab='Total Sales')
+  plot(fcast, main=division, xlab='Year (weeks)', ylab='Total Sales')
   lines(data)
   legend("topleft", lty=1, col=c(1,2), legend = c("Data"))
   dev.off()
@@ -118,6 +119,8 @@ multireg_all_divisions = function(do_res=TRUE){
 # Calls multireg_division for all divisions
 # Returns a list with four elements-lists which correspond to the divisions:
 # 1. Fit summaries 2. Durbin-Watson tests 3. Fitted data 4. Forecasted data
+# Example to acccess the desired element, if values=multireg_all_divisions():
+# values$fcasts$GIRLS gets the forecasted values for the "GIRLS" division.
   sum_ups=list(); dws=list(); fits=list(); fcasts=list()
   
   for (division in division_titles){
@@ -133,6 +136,8 @@ stl_all_divisions = function(trend=15, season=3, lambda=0.35){
 # Calls multireg_division for all divisions
 # Returns a list with two elements-lists which correspond to the divisions:
 # 1. Fitted data 2. Forecasted data
+# Example to acccess the desired element, if values=stl_all_divisions():
+# values$fits$GIRLS gets the fitted values for the "GIRLS" division.
   fits=list(); fcasts=list()
   
   for (division in division_titles){
