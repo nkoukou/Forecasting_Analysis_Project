@@ -1,4 +1,5 @@
 ### Performs test2 (borrowing scripts from plots.R and predictors.R).
+### Search for "setwd" to change directory in the script.
 
 library(forecast)
 
@@ -57,21 +58,45 @@ stl_class = function(class, trend=15, season="periodic", lambda=0.35, cout=FALSE
   return(return_list)
 }
 
-stl_classes = function(){
+stl_classes = function(){ #Forecasts all classes for ten weeks
   setwd('C:\\Users\\Nikos\\Desktop\\itim\\test2_v1')
   for (class in classes){
     fcast = stl_class(class, cout=TRUE)
-    write.csv(fcast$fcast, file=paste(gsub("\\.","_", test[3,class]), ".txt",sep=""))
+    write.csv(fcast$fcast, file=paste(gsub("\\.","_", class), ".txt",sep=""))
   }
   setwd('C:\\Users\\Nikos\\Desktop\\itim')
 }
 
+# TBATS forecasting
+tbats_class = function(class, cout=FALSE){ #Forecasts a class for ten weeks
+  data = create_timeseries(class, is_stl=FALSE)
+  fit = tbats(data)
+  fcast = forecast(fit, h=10)
+  plot(fcast, main=test[3, class], xlab='Year (weeks)', ylab='Sales')
+  lines(data)
+}
 
+tbats_classes = function(){ #Forecasts all classes for ten weeks
+  for (class in classes){
+    fcast=tbats_class(class)
+  }
+}
 
+# ARIMA forecasting
+arima_class = function(class, cout=FALSE){ #Forecasts a class for ten weeks
+  data = create_timeseries(class, is_stl=FALSE)
+  bestfit = list(aicc=Inf)
+  fit = auto.arima(data)
+  fcast = forecast(fit, h=10)
+  plot(fcast, main=test[3, class], xlab='Year (weeks)', ylab='Sales')
+  lines(data)
+}
 
-
-
-
+arima_classes = function(){ #Forecasts all classes for ten weeks
+  for (class in classes){
+    fcast=arima_class(class)
+  }
+}
 
 
 
