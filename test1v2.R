@@ -1,9 +1,9 @@
 ### Performs test1 (borrowing scripts from plots.R and predictors.R).
 ### Search for "C:\" to change directories in the script.
 
-library(forecast)
-library(tseries)
-library(readxl)
+require(forecast)
+require(tseries)
+require(readxl)
 
 # DEFINITIONS
 
@@ -11,8 +11,8 @@ SalesData = read_excel("C:\\Users\\Nikos\\Desktop\\itim\\sales_data.xlsx", sheet
 
 rows = nrow(SalesData)
 cols = ncol(SalesData)
-dummy_rows = c(-1,-2,-3)
-dummy_cols = c(-1,-2,-3,-108,-109)
+dummy_rows = c(-1:-3)
+dummy_cols = c(-1:-3,-108,-109)
 
 departments = SalesData[dummy_rows,2]
 divisions=c() #Defines (below) all the different divisions by their title
