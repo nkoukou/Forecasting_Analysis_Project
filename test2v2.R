@@ -1,4 +1,4 @@
-### Performs test1 (borrowing scripts from plots.R and predictors.R).
+### Performs test2 (borrowing scripts from plots.R and predictors.R).
 ### Search for "C:\" to change directories in the script.
 
 if(!exists("divisions", mode="function")) source('test1v2.R')
