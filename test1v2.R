@@ -113,7 +113,7 @@ profile_div = function(div){ #Calculates Euclidean metric between division and i
   return(metrics)
 }
 
-profile_divs = function(){#Calls profile_div for all divisions
+profile_div_all = function(cout=FALSE){#Calls profile_div for all divisions
   metrics=list()
   for (div in divisions){
     metric = profile_div(div)
@@ -123,7 +123,19 @@ profile_divs = function(){#Calls profile_div for all divisions
       i=i+1
     }
   }
-  return(metrics)
+  if (cout==FALSE){
+    return(metrics)
+  }
+  else{
+    setwd('C:\\Users\\Nikos\\Desktop\\itim\\norm_graphs_action_concepts')
+    metr = c(); j=1
+    for (i in metrics){
+      metr[j]=i
+      j=j+1
+    }
+    write(metr, "eucl.txt", ncolumns=1)
+    setwd('C:\\Users\\Nikos\\Desktop\\itim')
+  }
 }
 
 # Time series plots

@@ -28,7 +28,6 @@ multireg_class = function(row2, cout=FALSE){
   sum_up = summary(fit)
   fitted_data = fitted(fit)
   resids = residuals(fit)
-  #dw = dwtest(fit, alt="two.sided")
   fcast = forecast(fit, h=10)
   return_list = list("sum_up"=sum_up, "fitted_data"=fitted_data,
                      "fcast_data"=data.frame(fcast), "residuals"=data.frame(resids))
@@ -92,7 +91,6 @@ cout_plots = function(data_cout=FALSE){
   multireg_class_all(cout=TRUE, data_cout=data_cout)
   setwd('C:\\Users\\Nikos\\Desktop\\itim')
 }
-
 
 
 

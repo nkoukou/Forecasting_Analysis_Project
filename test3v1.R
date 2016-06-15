@@ -78,9 +78,8 @@ forecast_class_all = function(cout=FALSE){
     }
     setwd('C:\\Users\\Nikos\\Desktop\\itim')
   }
- 
+  
 }
-
 
 
 
