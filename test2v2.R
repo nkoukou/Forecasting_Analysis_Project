@@ -62,27 +62,17 @@ multireg_class = function(row2, cout=FALSE){
 
 multireg_class_all = function(cout=FALSE, data_cout=FALSE){
   if (data_cout==FALSE){
-    for (row2 in seq(3, rows2)){
+    for (row2 in seq(28, rows2)){
       multireg_class(row2, cout=cout)
     }
   }
   else{
-    fcast_data_set = SalesData2
-    
-    for (col2 in seq(1,10)){
-      fcast_data_set[1,cols2+col2] = 2016
-      fcast_data_set[2,cols2+col2] = fcast_data_set[2,5+col2]
+    for (row2 in seq(28, rows2)){
+      setwd('C:\\Users\\Nikos\\Desktop')
+      x = data.frame(multireg_class(row2, cout=cout)$fcast_data)[1]
+      write(x, file=row2)
+      setwd('C:\\Users\\Nikos\\Desktop\\itim')
     }
-    for (row2 in seq(3, rows2)){
-      current_data = multireg_class(row2, cout=cout)
-      fcast_data = current_data$fcast_data
-      for (col2 in seq(1,10)){
-        fcast_data_set[row2,cols2+col2] = fcast_data[col2,1]
-        fcast_data_set[rows2+row2-1,cols2+col2] = fcast_data[col2,2]
-        fcast_data_set[2*rows2+row2-2,cols2+col2] = fcast_data[col2,3]
-      }
-    }
-    write.xlsx(fcast_data_set, "fcast_data_set.xlsx", sheetName="fcast_data")
   }
 }
 
