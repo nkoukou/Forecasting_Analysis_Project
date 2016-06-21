@@ -1,0 +1,234 @@
+\documentclass[11pt]{article}
+
+%%%
+\iffalse
+\begin{figure}
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.7\linewidth]{dispersion.png}
+  \captionof{figure}{Dispersion curve}
+  \label{dispersion}
+\end{minipage}
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.7\linewidth]{speeds.png}
+  \captionof{figure}{Phase and group speed}
+  \label{speeds}
+\end{minipage}
+\end{figure}
+%---%
+\begin{wrapfigure}{r}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{lid.png}
+\end{center}
+\caption{This is a scatter plot of the rms radius varying with wavelength. The focal length of the lens is $f = 75.6\ mm$ and the beam diameter is $D = 10\ mm$.}
+\label{wavelength}
+\end{wrapfigure}
+%---%
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.5]{lip.png}
+\caption{The principal series relation for Lithium. It is assumed that quantum defects in $p$ states are negligible.}
+\label{p}
+\end{figure}
+\fi
+
+%%%
+
+\setlength\parindent{0pt}
+
+\usepackage[a4paper, vscale = 0.85, hscale = 0.81]{geometry}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{wrapfig}
+\usepackage[font = small]{caption}
+\newcommand{\nth}{\textsuperscript}
+
+\usepackage[hidelinks]{hyperref}
+
+\title{Forecasting analysis of test data using multivariable regression and similarity metrics}
+\author{Nikolaos Koukoulekidis}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+
+\begin{abstract}
+A test dataset of weekly sales was analysed. Euclidean distance was used as a similarity metric between products and corresponding divisions. Multivariable regression was used for product and division level forecasts around 2015 Christmas period and early 2016 low sales period. Forecasts were compared to the actual data. Hence, the forecasts were found to be accurate, but with large standard errors, while the product level led to more accurate forecasts than the division level.
+\end{abstract}
+
+
+\section{Introduction}
+Time series (TS) analysis is a very general tool used for sales forecasting. There are numerous ways of applying TS analysis depending on the data set in question, including moving averages, exponential smoothing and regression techniques. The appropriateness of each, as well as the ``best'' way of using them are two properties that are difficult to determine~\cite{Keogh}.\\
+
+The study described in this report touched upon the above methods and explored the use of multivariable regression (MR) for forecasts of weekly sales data. Similarity metrics were also developed in order to correlate the product sales with their corresponding division level forecasts. Results of some products were finally compared with actual data to examine the power of MR.
+
+\section{Method}
+
+The initial data set given contained about thirty divisions. Each division contained a varying number of departments which in turn contained specific variants of products. Therefore, there were various levels to be examined. Generally, the sales data provided comprised of weekly sales for the years $2014$ and $2015$.\\
+
+The first step of analysis was the acquisition of sales profiles at the division level of all the divisions. Plotting the sales data of a division gave a first, most general impression for the sales trend and seasonality. It also allowed for comparisons between division and department level. The metric used in order to achieve that was the Euclidean distance (ED):
+
+\begin{align}
+d_E &= \sqrt{\sum_{t=1}^{T} (a_t + b_t)^2}, \label{ED}
+\end{align}
+
+where $a_t$ and $b_t$ are the normalised TS of the department and its division respectively. Since the division TS includes the department TS plus others, a z-normalisation was performed to scale the two TSs so that they can be compared. For example,
+
+\begin{align}
+a_t &= \frac{a_t'-\bar{a}}{\sigma}, \label{ZNorm}
+\end{align}
+
+where $\bar{a}$ and $\sigma$ are the mean and standard deviation of the department TS, while $a_t'$ is the unnormalised TS.\\
+
+The step after the profile determination of the departments following from the above method, involved forecasts of around thirty specified product variants for the first ten weeks of $2016$. These variants were only forecast at the product level using MR. The general formula for MR used~\cite{Hynd} is
+
+\begin{align}
+y_i = \beta_0 + \sum_{j=1}^{N} \beta_j x_{j,i} + e_i, \label{MR}
+\end{align}
+
+where $y_i$ is the i\nth{th} predicted variable which depends on the $x_{j,i}$ predictors. Each predictor has some strength indicated by the associated $\beta_j$ coefficient. There is also an error factor $e_i$. This is essentially a TS decomposition into trend and seasonal parts. The predictors were 51 of the 52 weeks. One week was excluded to avoid the ``dummy variable trap''. Forecasts were produced within the range of $80\%$ confidence intervals. Residual and autocorrelation (ACF) plots were also obtained to enhance understanding of the model.\\
+
+Finally, another set of around thirty specified product variants was used to obtain forecasts around the Christmas period in 2015 when there is a peak in sales. Two different methods were used this time. Apart from the usual MR decomposition described above, forecasts were also obtained for the variants by forecasting at the division level. Specifically, the corresponding divisions of the products were forecast by MR, then the data obtained over the 2014-2015 interval were z-normalised and rescaled to product level by multiplying with the product standard deviation and adding the product mean. This allowed for comparison between forecasting at product and division level.
+
+\section{Results and Discussion}
+\subsection{Department profiles}
+The determination of the departmental profile gives insight into how good a division level forecast would be for that department. In other words, it reveals how close the seasonality and trend of the department is compared to a division. Some departments illustrate sales profiles which are close to the corresponding division profiles. One such example is the ``Action figure playsets'' department of the ``Action concepts'' division.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.4]{ACTION_FIGURE_PLAYSETS_ts.png}
+\caption{The Euclidean distance of the department is $d_E=19.2$. The seasonality of the department seems to be similar to the seasonality of the division.}
+\label{11}
+\end{figure}
+
+The divisional normalised TS peeks at the Christmas period in both 2014 and 2015. ``Action figure playsets'' follows this pattern. This is different for the ``Spinning tops'' department below.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.55]{SPINNING_TOPS_ts.png}
+\caption{The Euclidean distance of the department is $d_E=17.2$. The seasonality of the department seems to be less similar to the seasonality of the division.}
+\label{12}
+\end{figure}
+
+In this case, there is a small peak right before Christmas in 2015 succeeding a very large peak in early 2014, the after Christmas period. This trend-like behaviour is dissimilar to the division seasonal pattern to some extent. The large peak may be due to increased promotion of the department's products during the 2013 Christmas period, but there is not enough data to prove or disprove this argument.\\
+
+What is more important is that, although figure \ref{11} depicts a departmental profile which fits the division better, the Euclidean distance is shorter for the ``Spinning tops'' department. Hence, this metric is rather crude and gives a very rough measure of similarity. This is to be expected, since the Euclidean distance involves some averaging throughout the time series and does not capture the seasonality of the series very well.\\
+
+Overall, the Euclidean distances for all departments throughout the divisions are relatively constant and range between $10-20$. Some departments have very low numbers and indicate no trend or seasonality at all.
+
+\subsection{Simple product level MR forecasts}
+Product variants have smaller numbers of sales and thus more complicated time series compared to their divisions. Therefore, MR fits the data in an overly detailed way as illustrated in figure \ref{21}.\\
+
+The overcomplicated MR fitting is certainly not to be trusted up to full detail, but captures some of the seasonal and trend patterns of the department. The residuals and autocorrelation graphs in figure \ref{22} associated with the forecast of the ``Boys pocket money'' department, indicate that there is still some information to be extracted by further analysing the residuals.
+
+\clearpage
+
+\begin{figure}[ht]
+\centering
+\begin{minipage}{.7\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{BOYS_POCKET_MONEY_forecast.png}
+  \captionof{figure}{Blue colour corresponds to the forecast. The shaded area around the forecast line indicates the $80\%$ confidence interval. There is too much detail in the fitting.}
+  \label{21}
+\end{minipage}
+\begin{minipage}{.7\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{BOYS_POCKET_MONEY_residuals.png}
+  \captionof{figure}{The blue dashed lines indicate conventional limits between which the residuals are probably white noise. The graphs indicate an oscillatory behaviour.}
+  \label{22}
+\end{minipage}
+\end{figure}
+
+\clearpage
+
+This oscillatory behaviour seen in figure \ref{22} is typical of the MR analysis performed at product level. The residuals thus seem to be correlated and therefore a more appropriate model perhaps avoids that.\\
+
+However, there are some departments with smooth features which result in smooth MR data fits as well. The ``Brain teaser games'' is a department exhibiting such behaviour in figure \ref{23}. It follows a simple pattern which illustrates no trend, but seasonal peaks during Christmas time. The MR fitting still displays too much detail and the residual plots still oscillate, but to a much lesser extent. The residual plot in figure \ref{24}, in particular, essentially consists of two spikes during Christmas time.
+
+\begin{figure}[ht]
+\centering
+\begin{minipage}{.67\textwidth}
+  \centering
+  \includegraphics[width=.74\linewidth]{BRAIN_TEASER_GAMES_forecast.png}
+  \captionof{figure}{This department is in the ``Games'' division. There is less detail in the fitting. The forecast captures the seasonal pattern of low sales after the Christmas period.}
+  \label{23}
+\end{minipage}
+\begin{minipage}{.67\textwidth}
+  \centering
+  \includegraphics[width=.74\linewidth]{BRAIN_TEASER_GAMES_residuals.png}
+  \captionof{figure}{The residuals are less oscillatory and the autocorrelation remains well within the dashed lines for the most part.}
+  \label{24}
+\end{minipage}
+\end{figure}
+
+\subsection{Division and product level MR forecasts}
+The final set of twenty seven departments which were analysed at both the division and variant level, presents some interesting features. Many departments have similar forecasts at both levels, as is the case in figure \ref{31} which depicts the ``Other AAA batteries'' department.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.55]{OTHER_AAA_BATTERIES_forecast.png}
+\caption{The black vertical line indicates the start of the Christmas period. The two forecast methods are very similar.}
+\label{31}
+\end{figure}
+
+The whole red curve comes from MR fitting and forecasting on the division as explained in the Method section. This is why it always continuous at the vertical black line. In many cases the blue curve, corresponding to the forecast at the variant level, starts at a significantly different value of total sales, as in figure \ref{32}. This is probably due to how the MR fitting works. If the variant and the associated division have significantly different patterns, then MR, which displays too much detail on both fittings, will give significantly different forecasts some times. They seem to have similar averages though, capturing the no-trend behaviour of the variants, but the division level forecast naturally displays stronger seasonality.\\
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.55]{STAR_WARS_FIGS_forecast.png}
+\caption{The two forecast methods are significantly less similar. The confidence level is large.}
+\label{32}
+\end{figure}
+
+After forecasting this set of variants, the forecasts were compared with the actual data for the 2015 Christmas period. This was done by calculating the root mean square error ($RMSE$)~\cite{Hynd} between forecast and actual data for that period. The lower $RMSE$ is, the closer the forecast data to the actual sales numbers. Three out of four variants, clearly indicate that the product level forecasts are closer to the actual values than the division level forecasts. The ``Star wars figs'' variant illustrated in figure \ref{32} is an exception giving $RMSE=249$ for the division level and $RMSE=309 > 249$ for the product level. This is probably because the seasonality of the variant is not well captured by the product level forecast.\\
+
+Comparison with actual data was performed for some of the forecasts of the first ten weeks in 2016 considered in the second subsection. Generally, the $RMSE$ values calculated are half an order of magnitude less than the sales numbers, indicating that MR can mostly provide rough forecasts, which are nevertheless not completely unreliable.
+
+\section{Conclusion}
+This study investigated the appropriateness of multivariable regression as a forecasting model and  Euclidean distance as a similarity metric to analyse a test dataset of weekly sales. The general features of MR and ED tended to result in roughly correct forecasts, as tested by comparing the forecasts to the actual sales data. However, there were some issues arising due to the MR and ED simplified nature. Mainly, ED is a bulk similarity metric and did not capture seasonality very well. MR fits data with too much detail which is not needed and affects the forecasts. Additionally, MR sometimes gave unrealistically negative predicted sales numbers when it was used to forecast periods of low sales in early 2016 after the Christmas peak. Finally, product variant level forecasting seemed to provide more accurate results than the division level.\\
+
+The data analysis performed could have improved if specific features of the TSs were analysed in more depth. For example, considering promotion periods and other causes of diversion from the expected seasonal behaviour, would lead to a better understanding of the similarity between products and their corresponding divisions. Use of dynamical time warping in that case, in order to take into account that these periods of promotion etc. happen at different times for different products would help develop more accurate similarity metrics. This could lead to improved division level forecasts. Comparing the product level to the class or department level would probably provide more accurate forecasts as well, since these levels are closer to the variant.\\
+
+The initial experimenting of this study with exponential smoothing and moving averages gave the impression that these models focus less on the detailed features of the fitting and perhaps could give rise to smoother and more accurate forecasts. ARIMA models could also be used. These methods are generally praised more for aggregate sales~\cite{fin}, so probably they could also improve forecasts for the weekly data analysed at the product level. Seasonal ARIMA models in particular could probably improve forecasts, according to literature~\cite{fin} and its suitability for the dataset. For example neural networks might not be very helpful due to the small time interval of the sales and the fact that there is only one control data set to test the forecasts.
+
+
+\begin{thebibliography}{1}
+\bibitem {Keogh} Keogh E. and Kasetty S. (2003) \textit{On the Need for Time Series Data Mining Benchmarks: A Survey and Empirical Demonstration}, Data Mining and Knowledge Discovery, 7 (4), 349-371.
+\bibitem {Hynd} Hyndman, R. and Athanasopoulos G., (last update: 2016) \textit{Forecasting: principles and practice}, OTexts, Available from: \text{https://www.otexts.org/book/fpp}.
+\bibitem {fin} Chu C. and Zhang G. (2003) \textit{A comparative study of linear and nonlinear models for aggregate retail sales forecasting}, Int. J. Production Economics, 86, 217–231.
+\end{thebibliography}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
